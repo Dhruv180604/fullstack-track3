@@ -1,23 +1,32 @@
 import React from 'react';
 
+function formatDate(iso){
+  if(!iso) return '';
+  try {
+    const d = new Date(iso);
+    return d.toLocaleString();
+  } catch { return iso; }
+}
+
 export default function TodoItem({ todo, onUpdate, onDelete }) {
   function toggleDone() {
-    onUpdate(todo.id, { 
-      title: todo.title, 
-      description: todo.description, 
-      done: !todo.done 
-    });
+    onUpdate(todo.id, { title: todo.title, description: todo.description, done: !todo.done });
   }
 
   return (
-    <div style={{ padding: 10, border: '1px solid #ddd', marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems:'center' }}>
-      <div>
-        <strong style={{ textDecoration: todo.done ? 'line-through' : 'none' }}>{todo.title}</strong>
-        <div style={{ fontSize: 13, color: '#444' }}>{todo.description}</div>
+    <div className={`todo ${todo.done ? 'done' : ''}`}>
+      <div className="todo-left">
+        <div className="avatar">{(todo.title || 'T').slice(0,2).toUpperCase()}</div>
+        <div className="todo-body">
+          <h3 className="todo-title">{todo.title}</h3>
+          <div className="todo-desc">{todo.description || 'No description'}</div>
+          <div style={{fontSize:12, color:'var(--muted)', marginTop:8}}>{formatDate(todo.created_at)}</div>
+        </div>
       </div>
-      <div>
-        <button onClick={toggleDone} style={{ marginRight:8 }}>{todo.done ? 'Undo' : 'Done'}</button>
-        <button onClick={() => onDelete(todo.id)}>Delete</button>
+
+      <div className="actions">
+        <button className="small" onClick={toggleDone}>{todo.done ? 'Undo' : 'Done'}</button>
+        <button className="small" style={{background:'transparent', color:'var(--danger)', border:'1px solid rgba(255,255,255,0.04)'}} onClick={()=>onDelete(todo.id)}>Delete</button>
       </div>
     </div>
   );
