@@ -1,23 +1,19 @@
 // db.js
-const Database = require('better-sqlite3');
-const path = require('path');
-const fs = require('fs');
+import sqlite3 from "sqlite3";
+import { open } from "sqlite";
 
-const dataDir = path.join(__dirname, '..', 'data');
-if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir);
+export const initDB = async () => {
+  const db = await open({
+    filename: "./database.db",
+    driver: sqlite3.Database,
+  });
 
-const dbPath = path.join(dataDir, 'app.db');
-const db = new Database(dbPath);
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS todos (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL
+    );
+  `);
 
-// create todos table if not exists
-db.exec(`
-CREATE TABLE IF NOT EXISTS todos (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  title TEXT NOT NULL,
-  description TEXT,
-  done INTEGER DEFAULT 0,
-  created_at TEXT DEFAULT CURRENT_TIMESTAMP
-);
-`);
-
-module.exports = db;
+  return db;
+};
